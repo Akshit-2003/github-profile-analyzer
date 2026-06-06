@@ -4,7 +4,26 @@ const db = require('./db');
 require('dotenv').config();
 
 const app = express();
+// Automatically create table if it doesn't exist
+db.execute(`
+    CREATE TABLE IF NOT EXISTS profiles (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        name VARCHAR(255),
+        public_repos INT DEFAULT 0,
+        followers INT DEFAULT 0,
+        following INT DEFAULT 0,
+        profile_url VARCHAR(255),
+        bio TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`).then(() => console.log("Database table is ready!"))
+  .catch(err => console.error("Table creation error:", err));
 app.use(express.json());
+// Base route for browser testing
+app.get('/', (req, res) => {
+    res.send("Welcome to GitHub Profile Analyzer API! API is running perfectly.");
+});
 
 // API 1: 
 app.post('/api/analyze/:username', async (req, res) => {
